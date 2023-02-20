@@ -1,7 +1,12 @@
-import './App.css';
-import{useRef, useEffect, useState} from "react";
+import './stylesheets/App.css';
+import{useEffect, useState} from "react";
+import Popup from './Popup';
 
 function App() {
+  
+  //Popop State item
+  const [popup, setPopup] = useState(false)
+  const [result, setResult] = useState("Fail")
 
   //Set State variables for Current Guesses.
   const [currentGuess, setCurrentGuess] = useState(1);
@@ -21,8 +26,9 @@ function App() {
   const [fourthGuessArray, setFourthGuessArray] = useState(defaultGuessArray);
   const [fifthGuessArray, setFifthGuessArray] = useState(defaultGuessArray);
   const [sixthGuessArray, setSixthGuessArray]= useState(defaultGuessArray);
+  
   //Get the word of the day
-  let dailyWord = ("slice").split('');
+  let dailyWord = (/*Wire to function*/"slice").split('');
 
   // When you hit enter itterate the current guess
   const handleKeyDown = (event) => {
@@ -51,20 +57,34 @@ function App() {
   };
 
   function checkGuess(guess) {
-    let guessArray = []
+    let guessArray = [];
+    let correctCount = 0;
     for (let i = 0; i < 5; i++){
       if(dailyWord[i] === guess[i]) {
         guessArray[i] = "correct";
+        correctCount ++;
       } else if(dailyWord.includes(guess[i])) {
         guessArray[i] = "contains";
       } else {
         guessArray[i] = "incorrect";
-      }
-      
+      }   
+    }
+    // Check if there were 5 correct letters to see if the puzzle is solved
+    if(correctCount === 5){
+      // If the guess is correct set every check to true.
+      setResult("Solved");
+      setCorrectGuess(true);
+      setPopup(true);
+    }else{
+      setCorrectGuess(false)
     }
     return guessArray;
   }
   
+  const handleSave =() =>{
+    setPopup(false);
+  }
+
   // Populate the guess form
   const handleChange = (e) => {
     if(currentGuess === 1 && !correctGuess){
@@ -91,8 +111,6 @@ function App() {
 
   return (
     <div className="App">
-      {console.log(dailyWord)}
-      {currentGuess}
       <div className="play-area">
         <div id="play-cell" className={firstGuessArray[0]}>{firstGuess[0]}</div>
         <div id="play-cell" className={firstGuessArray[1]}>{firstGuess[1]}</div>
@@ -138,6 +156,14 @@ function App() {
       <div>
         <input type="text" maxLength="5" onChange={handleChange} onKeyDown={handleKeyDown} />
       </div>
+      {popup && (
+        <Popup
+          popup={popup}
+          currentGuess={currentGuess}
+          result={result}
+          handleSave={handleSave}
+          />
+      )}
     </div>
   );
 }
