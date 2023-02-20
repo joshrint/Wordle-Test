@@ -9,7 +9,8 @@ function App() {
   const [result, setResult] = useState("Fail")
 
   //Set State variables for Current Guesses.
-  const [currentGuess, setCurrentGuess] = useState(1);
+  const [currentGuess, setCurrentGuess] = useState("");
+  const [currentGuessNum, setCurrentGuessNum] = useState(1);
   const [firstGuess, setFirstGuess] = useState("");
   const [secondGuess, setSecondGuess] = useState("");
   const [thirdGuess, setThirdGuess] = useState("");
@@ -19,7 +20,7 @@ function App() {
   const [correctGuess, setCorrectGuess] = useState(false);
 
   const defaultGuessArray = ["neutral", "neutral", "neutral", "neutral", "neutral"]
-  //Set the current arrays for guesses
+  //Set the current arrays for guesses css classes
   const [firstGuessArray, setFirstGuessArray] = useState(defaultGuessArray);
   const [secondGuessArray, setSecondGuessArray] = useState(defaultGuessArray);
   const [thirdGuessArray, setThirdGuessArray] = useState(defaultGuessArray);
@@ -32,28 +33,27 @@ function App() {
 
   // When you hit enter itterate the current guess
   const handleKeyDown = (event) => {
-    
-    if (event.key === 'Enter') {
-      if(currentGuess === 1 && !correctGuess){
-        // Set the guess state to register correct, incorrect, and contains for CSS styling
+    // Check if enter has been hit and the message is exactly 5 characters long
+    if (event.key === 'Enter' && currentGuess.length === 5) {
+      // Set the guess state to register correct, incorrect, and contains for CSS styling. Itterate over every set 
+      if(currentGuessNum === 1 && !correctGuess){
         setFirstGuessArray(checkGuess(firstGuess));
-      } else if(currentGuess === 2 && !correctGuess){
+      } else if(currentGuessNum === 2 && !correctGuess){
         setSecondGuessArray(checkGuess(secondGuess));
-      } else if(currentGuess === 3 && !correctGuess){
+      } else if(currentGuessNum === 3 && !correctGuess){
         setThirdGuessArray(checkGuess(thirdGuess));
-      } else if(currentGuess === 4 && !correctGuess){
+      } else if(currentGuessNum === 4 && !correctGuess){
         setFourthGuessArray(checkGuess(fourthGuess));
-      } else if(currentGuess === 5 && !correctGuess){
+      } else if(currentGuessNum === 5 && !correctGuess){
         setFifthGuessArray(checkGuess(fifthGuess));
-      } else if(currentGuess === 6 && !correctGuess){
+      } else if(currentGuessNum === 6 && !correctGuess){
         setSixthGuessArray(checkGuess(sixthGuess));
       }
-      if(currentGuess <= 5 && !correctGuess){
-        setCurrentGuess(parseInt(currentGuess)+1);
-      }
-    } else if (currentGuess > 6) {
-      console.log("Game Over");
+      //Incerement guess count and reset the input
+      setCurrentGuessNum(parseInt(currentGuessNum)+1);
+      setCurrentGuess("");
     }
+
   };
 
   function checkGuess(guess) {
@@ -75,31 +75,59 @@ function App() {
       setResult("Solved");
       setCorrectGuess(true);
       setPopup(true);
-    }else{
-      setCorrectGuess(false)
+    //Set Failure
+    }else if (currentGuessNum === 6 && correctCount < 5){
+      setResult("Failed. Correct Word = " + dailyWord.join(""));
+      setPopup(true);
     }
     return guessArray;
   }
   
+  // Handle save game button press (To be wired up)
   const handleSave =() =>{
     setPopup(false);
   }
 
+  // Handle reset game button press 
+  const handleReset =() =>{
+    //Reset Guess Count
+    setCurrentGuessNum(1);
+    setCorrectGuess(false);
+    //Reset Guesses
+    setFirstGuess("");
+    setSecondGuess("");
+    setThirdGuess("");
+    setFourthGuess("");
+    setFifthGuess("");
+    setSixthGuess("");
+    //Reset CSS Arrays
+    setFirstGuessArray(defaultGuessArray);
+    setSecondGuessArray(defaultGuessArray);
+    setThirdGuessArray(defaultGuessArray);
+    setFourthGuessArray(defaultGuessArray);
+    setFifthGuessArray(defaultGuessArray);
+    setSixthGuessArray(defaultGuessArray);
+    //hide popup
+    setPopup(false);
+
+  }
+
   // Populate the guess form
   const handleChange = (e) => {
-    if(currentGuess === 1 && !correctGuess){
+    if(currentGuessNum === 1 && !correctGuess){
       setFirstGuess(e.target.value);
-    } else if(currentGuess === 2 && !correctGuess){
+    } else if(currentGuessNum === 2 && !correctGuess){
       setSecondGuess(e.target.value);
-    } else if(currentGuess === 3 && !correctGuess){
+    } else if(currentGuessNum === 3 && !correctGuess){
       setThirdGuess(e.target.value);
-    } else if(currentGuess === 4 && !correctGuess){
+    } else if(currentGuessNum === 4 && !correctGuess){
       setFourthGuess(e.target.value);
-    } else if(currentGuess === 5 && !correctGuess){
+    } else if(currentGuessNum === 5 && !correctGuess){
       setFifthGuess(e.target.value);
-    } else if(currentGuess === 6 && !correctGuess){
+    } else if(currentGuessNum === 6 && !correctGuess){
       setSixthGuess(e.target.value);
     }
+    setCurrentGuess(e.target.value);
     
   }
 
@@ -154,14 +182,15 @@ function App() {
         <div id="play-cell" className={sixthGuessArray[4]}>{sixthGuess[4]}</div>
       </div>
       <div>
-        <input type="text" maxLength="5" onChange={handleChange} onKeyDown={handleKeyDown} />
+        <input type="text" maxLength="5" value={currentGuess} onChange={handleChange} onKeyDown={handleKeyDown} />
       </div>
       {popup && (
         <Popup
           popup={popup}
-          currentGuess={currentGuess}
+          currentGuessNum={currentGuessNum}
           result={result}
           handleSave={handleSave}
+          handleReset={handleReset}
           />
       )}
     </div>

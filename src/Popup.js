@@ -8,7 +8,7 @@ import ModalTitle from 'react-bootstrap/ModalTitle';
     Modal Popup to show result and ask to save the game
 */
 
-export default function Popup({popup, currentGuess, result, handleSave}) {
+export default function Popup({popup, currentGuessNum, result, handleSave, handleReset}) {
     return (
         <div>
             <Modal show={popup}>
@@ -16,8 +16,8 @@ export default function Popup({popup, currentGuess, result, handleSave}) {
                     <ModalTitle>{result}</ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    <p>Number of Guesses: {currentGuess-1}</p>
-                    <p><button onClick={handleSave} className='btn btn-outline-success'>Save</button></p>
+                    <p>Number of Guesses: {currentGuessNum-1}</p>
+                    <p><button onClick={handleSave} className='btn btn-outline-success'>Save</button> <button onClick={handleReset} className='btn btn-outline-danger'>Reset</button></p>
                 </ModalBody>
             </Modal>
         </div>
