@@ -1,13 +1,14 @@
 import "./stylesheets/App.css";
 import { useEffect, useState } from "react";
-import Popup from "./Popup";
+import GameOverPopup from "./GameOverPopup";
 
 function App() {
   //Popop State item
-  const [popup, setPopup] = useState(false);
+  const [gameOverPopup, setGameOverPopup] = useState(true);
   const [result, setResult] = useState("Fail");
   const [dailyWord, setDailyWord] = useState();
   const [currentPlayer, setCurrentPlayer] = useState("");
+  const [history, setHistory] = useState([{"guesses":[], "playDate":0,"word":"","player":""}]);
 
   //Set State variables for Current Guesses.
   const [currentGuess, setCurrentGuess] = useState("");
@@ -102,11 +103,11 @@ function App() {
       // If the guess is correct set every check to true.
       setResult("Solved");
       setCorrectGuess(true);
-      setPopup(true);
+      setGameOverPopup(true);
       //Set Failure
     } else if (currentGuessNum === 6 && correctCount < 5) {
       setResult("Failed. Correct Word = " + dailyWord);
-      setPopup(true);
+      setGameOverPopup(true);
     }
     console.log(results.result);
     return results.result;
@@ -153,7 +154,8 @@ function App() {
       .catch((error) => {
         console.error("Error:", error);
       });
-    setPopup(false);
+    handleReset();
+    setGameOverPopup(false);
   };
 
   // Handle reset game button press
@@ -176,7 +178,7 @@ function App() {
     setFifthGuessArray(defaultGuessArray);
     setSixthGuessArray(defaultGuessArray);
     //hide popup
-    setPopup(false);
+    setGameOverPopup(false);
   };
 
   // Populate the guess form
@@ -200,6 +202,14 @@ function App() {
   const handlePlayer = (e) => {
     setCurrentPlayer(e.target.value);
   };
+
+  async function searchHistory() {
+    return fetch(
+        "https://wdoqst1fy4.execute-api.us-east-1.amazonaws.com/test/getgamehistory?player="+ currentPlayer
+      )
+        .then((response) => response.json())
+        .then((data) => setHistory(data));
+}
 
   useEffect(() => {
     getDailyWord();
@@ -319,15 +329,17 @@ function App() {
           onKeyDown={handleKeyDown}
         />
       </div>
-      {popup && (
-        <Popup
-          popup={popup}
+      {gameOverPopup && (
+        <GameOverPopup
+          gameOverPopup={gameOverPopup}
           currentGuessNum={currentGuessNum}
           result={result}
           handleSave={handleSave}
           handleReset={handleReset}
           currentPlayer={currentPlayer}
           handlePlayer={handlePlayer}
+          history={history}
+          searchHistory={searchHistory}
         />
       )}
     </div>
